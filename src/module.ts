@@ -13,6 +13,25 @@ export interface ModuleOptions {
   colorThemes?: {
     [themeName: string]: Partial<ThemeColors>
   }
+
+  /**
+ * Nome do cookie que armazena o idioma do usuário
+ * O módulo monitora este cookie para detectar mudanças de idioma
+ * @default 'i18n_redirected' (padrão do @nuxtjs/i18n)
+ */
+  localeCookie?: string
+
+  /**
+   * Locale padrão se nenhum for detectado
+   * @default 'en-US'
+   */
+  defaultLocale?: string
+
+  /**
+   * Locale que o módulo deve usar (força um idioma específico)
+   * Se definido, ignora cookies e navegador
+   */
+  locale?: string
 }
 
 export default defineNuxtModule<ModuleOptions>({
@@ -26,6 +45,9 @@ export default defineNuxtModule<ModuleOptions>({
     customCursor: true,
     colors: true,
     applyColors: true,
+    localeCookie: 'i18n_redirected',
+    defaultLocale: 'en-US',
+    locale: '',
   },
 
   setup(_options, _nuxt) {
@@ -75,20 +97,17 @@ export default defineNuxtModule<ModuleOptions>({
 
     if (shouldApplyColors) {
 
-      // Adiciona o @nuxt/icon automaticamente
-      _nuxt.options.modules = _nuxt.options.modules || []
-      if (!_nuxt.options.modules.includes('@nuxt/icon')) {
-        _nuxt.options.modules.push('@nuxt/icon')
-      }
-
-      addComponent({
-        name: 'ThemeIcon',
-        filePath: resolver.resolve('./runtime/components/ThemeIcon.vue')
+      // Plugin SSR (servidor)
+      addPlugin({
+        src: resolver.resolve('./runtime/plugins/theme-init.server'),
+        mode: 'server'
       })
 
-      addPlugin({
-        src: resolver.resolve('./runtime/plugins/theme-init.client'),
-        mode: 'client'
+      // Adicionar a extensão .ts
+      addTemplate({
+        src: resolver.resolve('./runtime/scripts/theme-init.template.ts'),  // Adicione .ts
+        filename: 'venix-theme-init.ts',
+        write: true
       })
     }
 
@@ -98,6 +117,9 @@ export default defineNuxtModule<ModuleOptions>({
       defaultTheme: theme.colors?.defaultColor || 'dark',
       colorThemes: _options.colorThemes || {},
       applyColors: shouldApplyColors,
+      localeCookie: _options.localeCookie || 'i18n_redirected',
+      defaultLocale: _options.defaultLocale || 'en-US',
+      locale: _options.locale || '',
       enabled: {
         typography: _options.typography !== false && theme.typography?.enabled !== false,
         customScrollbar: _options.customScrollbar !== false && theme.customScrollbar?.enabled !== false,

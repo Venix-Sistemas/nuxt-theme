@@ -4,6 +4,9 @@ export default defineNuxtConfig({
   compatibilityDate: 'latest',
 
   venixTheme: {
+
+    locale: 'en',
+
     // Tipografia customizada
     typography: {
       enabled: true,

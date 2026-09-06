@@ -1,6 +1,6 @@
 // runtime/composables/useTheme.ts
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
-import { useRuntimeConfig } from '#app'
+import { useRuntimeConfig, useCookie, useRequestHeaders } from '#app'
 import themeData from '../../app/theme.json'
 import type { ThemeConfig, ThemeColors } from '../../app/types'
 
@@ -8,38 +8,18 @@ export const useTheme = () => {
     const config = useRuntimeConfig()
     const themeConfig = config.public.venixTheme
 
-    // Cookies - MOVER PARA CIMA (antes de getCurrentLocale)
-    const getCookie = (name: string): string | null => {
-        if (typeof document === 'undefined') return null
-        const match = document.cookie.match(new RegExp('(^|; )' + name + '=([^;]+)'))
-        return match?.[2] ? decodeURIComponent(match[2]) : null
-    }
+    // Pega headers do SSR
+    const headers = useRequestHeaders(['accept-language'])
 
-    const hasConsent = (): boolean => {
-        if (typeof localStorage === 'undefined') return false
-        const consentData = localStorage.getItem('cookie-consent')
-        if (!consentData) return false
+    // Configurações do módulo
+    const localeCookieName = themeConfig?.localeCookie || 'i18n_redirected'
+    const defaultLocale = themeConfig?.defaultLocale || 'en-US'
+    const forcedLocale = themeConfig?.locale
 
-        try {
-            const consent = JSON.parse(consentData)
-            return consent.functionality === true
-        } catch (e) {
-            return false
-        }
-    }
-
-    const setCookieIfAllowed = (name: string, value: string) => {
-        if (typeof document === 'undefined') return
-        if (hasConsent()) {
-            document.cookie = `${name}=${encodeURIComponent(value)}; path=/; max-age=31536000; SameSite=Lax`
-        }
-    }
-
-    const removeCookie = (name: string) => {
-        if (typeof document !== 'undefined') {
-            document.cookie = `${name}=; path=/; max-age=0; SameSite=Lax`
-        }
-    }
+    // Cookies
+    const preferenceCookie = useCookie<string>('theme-preference')
+    const resolvedCookie = useCookie<string>('theme-resolved')
+    const localeCookie = useCookie<string>(localeCookieName)
 
     // Garantir que colors e themes existem
     const defaultColors: ThemeConfig['colors'] = {
@@ -49,6 +29,7 @@ export const useTheme = () => {
         themes: {}
     }
 
+    // THEME DEFINIDO AQUI (antes de detectLocale)
     const theme: ThemeConfig = {
         ...themeData as ThemeConfig,
         colors: {
@@ -70,34 +51,86 @@ export const useTheme = () => {
 
     const shouldApplyColors = themeConfig?.applyColors !== false && theme.colors.defaults !== false
 
-    // Agora getCookie está definida antes de getCurrentLocale
-    const getCurrentLocale = (): string => {
-        // 1. Tenta window.__INITIAL_LOCALE__
-        if (typeof window !== 'undefined' && window.__INITIAL_LOCALE__) {
-            return window.__INITIAL_LOCALE__
+    // Detecta locale de forma consistente entre SSR e cliente
+    const detectLocale = (): string => {
+        // Coleta todos os locales disponíveis nas traduções
+        const getAvailableLocales = (): string[] => {
+            const availableLocales = new Set<string>()
+            Object.values(theme.colors.themes).forEach(themeConfig => {
+                if (themeConfig.translations) {
+                    Object.keys(themeConfig.translations).forEach(locale => {
+                        availableLocales.add(locale)
+                    })
+                }
+            })
+            return Array.from(availableLocales)
         }
 
-        // 2. Tenta cookie
-        const cookieLocale = getCookie('theme-locale')
-        if (cookieLocale) return cookieLocale
+        // Encontra o melhor locale disponível
+        const findBestLocale = (requestedLocale: string): string => {
+            const availableLocales = getAvailableLocales()
 
-        // 3. Fallback para navigator
-        if (typeof navigator !== 'undefined') {
-            return navigator.language || 'en-US'
+            if (availableLocales.includes(requestedLocale)) return requestedLocale
+
+            const baseLocale = requestedLocale.split('-')[0]
+            const matchingLocale = availableLocales.find(locale =>
+                locale.split('-')[0] === baseLocale
+            )
+            if (matchingLocale) return matchingLocale
+
+            return defaultLocale
         }
 
-        return 'en-US'
+        // 1. Locale forçado via config
+        if (forcedLocale) return findBestLocale(forcedLocale)
+
+        // 2. Cookie de idioma
+        if (localeCookie.value) return findBestLocale(localeCookie.value)
+
+        // 3. SSR: usa accept-language header
+        const acceptLanguageHeader = headers['accept-language']
+        if (acceptLanguageHeader) {
+            const acceptLanguage = Array.isArray(acceptLanguageHeader)
+                ? acceptLanguageHeader[0]
+                : acceptLanguageHeader
+
+            if (acceptLanguage) {
+                const firstLocale = acceptLanguage.split(',')[0].split(';')[0].trim()
+                if (firstLocale) return findBestLocale(firstLocale)
+            }
+        }
+
+        // 4. Cliente: usa navigator.language
+        if (import.meta.client && typeof navigator !== 'undefined') {
+            return findBestLocale(navigator.language || defaultLocale)
+        }
+
+        // 5. Fallback final
+        return defaultLocale
     }
 
+    // Locale reativo
+    const currentLocale = ref<string>(detectLocale())
+
+    // Atualiza o locale quando o cookie mudar
+    watch(localeCookie, (newLocale) => {
+        if (newLocale && !forcedLocale) {
+            currentLocale.value = newLocale
+        }
+    })
+
+    // Função de tradução
     const translate = (translations?: Record<string, string>, fallback?: string): string => {
         if (!translations) return fallback || ''
 
-        const currentLocale = getCurrentLocale()
+        const locale = currentLocale.value
 
-        if (translations[currentLocale]) return translations[currentLocale]
+        if (translations[locale]) return translations[locale]
 
-        const baseLocale = currentLocale.split('-')[0]
+        const baseLocale = locale.split('-')[0]
         if (baseLocale && translations[baseLocale]) return translations[baseLocale]
+
+        if (translations[defaultLocale]) return translations[defaultLocale]
 
         if (translations['en-US']) return translations['en-US']
 
@@ -107,12 +140,18 @@ export const useTheme = () => {
         return fallback || ''
     }
 
+    const removeCookie = (name: string) => {
+        if (typeof document !== 'undefined') {
+            document.cookie = `${name}=; path=/; max-age=0; SameSite=Lax`
+        }
+    }
+
     const themes = computed(() => {
         return Object.entries(theme.colors.themes)
             .filter(([value]) => value !== 'system')
             .map(([value, themeConfig]) => ({
                 value,
-                name: translate(themeConfig.translations, value.charAt(0).toUpperCase() + value.slice(1)),
+                name: translate(themeConfig.translations, value),
                 icon: themeConfig.icon || '',
             }))
     })
@@ -126,11 +165,9 @@ export const useTheme = () => {
         })
     }
 
-    type ThemeValue = string
     const themeValues = computed(() => themes.value.map(t => t.value))
 
-    const preferenceCookie = getCookie('theme-preference')
-    const initialPreference = preferenceCookie || defaultTheme
+    const initialPreference = preferenceCookie.value || defaultTheme
     const preference = ref<string>(initialPreference || 'system')
 
     const getActiveSeasonalTheme = (prefersDark?: boolean): string | null => {
@@ -206,7 +243,7 @@ export const useTheme = () => {
     if (typeof document !== 'undefined' && shouldApplyColors) {
         const currentTheme = document.documentElement.getAttribute('data-theme')
         if (currentTheme) {
-            if (!preferenceCookie) {
+            if (!preferenceCookie.value) {
                 preference.value = currentTheme
             }
         } else {
@@ -218,7 +255,7 @@ export const useTheme = () => {
         if (!shouldApplyColors) return
 
         const mq = window.matchMedia('(prefers-color-scheme: dark)')
-        const handleSystemThemeChange = (e: MediaQueryListEvent) => {
+        const handleSystemThemeChange = () => {
             if (preference.value === 'system') apply('system')
         }
         mq.addEventListener('change', handleSystemThemeChange)
@@ -236,8 +273,8 @@ export const useTheme = () => {
         const midnightTimeout = checkSeasonalChange()
 
         const handleConsentUpdate = () => {
-            setCookieIfAllowed('theme-preference', preference.value)
-            setCookieIfAllowed('theme-resolved', getResolvedTheme(preference.value))
+            preferenceCookie.value = preference.value
+            resolvedCookie.value = getResolvedTheme(preference.value)
         }
         window.addEventListener('cookie-preferences-updated', handleConsentUpdate)
 
@@ -252,12 +289,16 @@ export const useTheme = () => {
         if (!shouldApplyColors) return
 
         apply(newPref)
-        setCookieIfAllowed('theme-preference', newPref)
-        setCookieIfAllowed('theme-resolved', getResolvedTheme(newPref))
+        preferenceCookie.value = newPref
+        resolvedCookie.value = getResolvedTheme(newPref)
     })
 
     const theme_toggle = (forceTheme?: string) => {
-        preference.value = forceTheme ?? (preference.value === 'light' ? 'dark' : 'light')
+        const newTheme = forceTheme ?? (preference.value === 'light' ? 'dark' : 'light')
+        preference.value = newTheme
+
+        preferenceCookie.value = newTheme
+        resolvedCookie.value = getResolvedTheme(newTheme)
     }
 
     const theme_data = computed(() =>
@@ -312,8 +353,8 @@ export const useTheme = () => {
             isSeasonalActive,
             activeSeasonalTheme,
             shouldApplyColors,
-            colors: theme.colors,  // Expõe as cores
-            themes: theme.colors.themes  // Expõe os temas
+            colors: theme.colors,
+            themes: theme.colors.themes
         },
         theme_data,
         theme_toggle,
@@ -322,12 +363,19 @@ export const useTheme = () => {
         addTheme,
         removeTheme,
         enablePersistence: () => {
-            setCookieIfAllowed('theme-preference', preference.value)
-            setCookieIfAllowed('theme-resolved', getResolvedTheme(preference.value))
+            preferenceCookie.value = preference.value
+            resolvedCookie.value = getResolvedTheme(preference.value)
         },
         disablePersistence: () => {
             removeCookie('theme-preference')
             removeCookie('theme-resolved')
-        }
+        },
+        currentLocale,
+        setLocale: (locale: string) => {
+            currentLocale.value = locale
+            if (!forcedLocale) {
+                localeCookie.value = locale
+            }
+        },
     }
 }

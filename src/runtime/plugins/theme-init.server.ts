@@ -1,21 +1,17 @@
-// runtime/plugins/theme-init.client.ts
-import { defineNuxtPlugin, useRuntimeConfig } from '#app'
+// runtime/plugins/theme-init.server.ts
+import { defineNuxtPlugin, useRuntimeConfig, useCookie, useHead } from '#app'
 import themeData from '../../app/theme.json'
 import type { ThemeConfig } from '../../app/types'
 
-declare global {
-    interface Window {
-        __INITIAL_THEME__?: string
-        __INITIAL_LOCALE__?: string
-    }
-}
-
 export default defineNuxtPlugin({
-    name: 'venix-theme-init',
+    name: 'venix-theme-init-server',
     enforce: 'pre',
     setup() {
         const config = useRuntimeConfig()
         const themeConfig = config.public.venixTheme
+
+        const resolvedCookie = useCookie<string>('theme-resolved')
+        const preferenceCookie = useCookie<string>('theme-preference')
 
         const theme: ThemeConfig = {
             ...themeData as ThemeConfig,
@@ -29,23 +25,21 @@ export default defineNuxtPlugin({
             }
         }
 
-        const html = document.documentElement
         const defaultTheme = theme.colors.defaultColor || 'dark'
         let resolvedTheme = defaultTheme
 
-        // Tenta pegar tema salvo
-        try {
-            const savedTheme = localStorage.getItem('theme-preference')
-            if (savedTheme && theme.colors.themes[savedTheme]) {
-                resolvedTheme = savedTheme
-            }
-        } catch (e) {
-            // localStorage indisponível
+        if (resolvedCookie.value && theme.colors.themes[resolvedCookie.value]) {
+            resolvedTheme = resolvedCookie.value
+        } else if (preferenceCookie.value && theme.colors.themes[preferenceCookie.value]) {
+            resolvedTheme = preferenceCookie.value
         }
 
-        // Aplica o tema ANTES da hidratação
-        html.setAttribute('data-theme', resolvedTheme)
-        html.classList.add(resolvedTheme)
-        window.__INITIAL_THEME__ = resolvedTheme
+        // Aplica no SSR diretamente
+        useHead({
+            htmlAttrs: {
+                'data-theme': resolvedTheme,
+                class: resolvedTheme
+            }
+        })
     }
 })

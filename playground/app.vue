@@ -19,9 +19,8 @@
         <client-only>
           <div class="theme-buttons">
             <button v-for="item in themes" :key="item.value" @click="theme_toggle(item.value)"
-              :class="{ active: item.value === theme.preference.value }" class="theme-button">
-              <ThemeIcon :name="item.icon" />
-              <span>{{ item.name }}</span>
+              :class="{ active: isActive(item) }" class="theme-button">
+              <span>{{ item.icon }} {{ item.name }}</span>
             </button>
           </div>
         </client-only>
@@ -90,6 +89,10 @@ const {
   theme_data,
   updateThemeColors,
 } = useTheme()
+
+const isActive = (item: { value: string }): boolean => {
+  return theme.preference.value === item.value
+}
 
 const activeTheme = ref('')
 

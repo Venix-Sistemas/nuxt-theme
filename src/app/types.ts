@@ -77,13 +77,16 @@ export interface ThemeColors {
     icon?: string
 }
 
-// Declaração do runtimeConfig
+// src/app/types.ts
 declare module '@nuxt/schema' {
     interface PublicRuntimeConfig {
         venixTheme?: {
             defaultTheme: string
             colorThemes: Record<string, Partial<ThemeColors>>
             applyColors: boolean
+            localeCookie: string
+            defaultLocale: string
+            locale: string
             enabled: {
                 typography: boolean
                 customScrollbar: boolean

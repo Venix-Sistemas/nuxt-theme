@@ -1,0 +1,4 @@
+1 - Permitir que o meu locale monitore o locale do projeto do usuário e seja sempre igual ao mesmo com watch
+(Se especificado pelo usuário final e existir esse locale de fato)
+2 - navigator.language
+3 - fallback inglês
