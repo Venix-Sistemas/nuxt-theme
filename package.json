@@ -2,9 +2,20 @@
   "name": "@venix/nuxt-theme",
   "version": "1.0.0",
   "description": "Complete color system for Nuxt: seasonal colors, automatic theme, SSR, Cookie Policy, cursor, scrollbar, etc...",
-  "repository": "Venix-Sistemas/nuxt-theme",
+  "keywords": [
+    "nuxt",
+    "module",
+    "theme",
+    "colors",
+    "dark-mode",
+    "typography",
+    "scrollbar",
+    "cursor"
+  ],
   "license": "MIT",
   "type": "module",
+  "author": "Vinicius da Silva Viana <contato@venixsistemas.com>",
+  "repository": "Venix-Sistemas/nuxt-theme",
   "exports": {
     ".": {
       "types": "./dist/types.d.mts",

@@ -5,24 +5,24 @@ export default defineNuxtConfig({
 
   venixTheme: {
 
-    locale: 'en',
+    //locale: 'pt',
 
     // Tipografia customizada
     typography: {
       enabled: true,
-      //defaultFonts: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-      //fontSize: "16px",
+      // defaultFonts: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+      // fontSize: "16px",
       customFonts: [
         {
-          name: "New Rocker",
-          //preload: true,
+          name: 'New Rocker',
+          // preload: true,
           sources: {
-            woff2: "/fonts/New_Rocker/NewRocker-Regular.woff2"
+            woff2: '/fonts/New_Rocker/NewRocker-Regular.woff2',
           },
-          //weight: "normal",
-          //style: "normal"
-        }
-      ]
+          // weight: "normal",
+          // style: "normal"
+        },
+      ],
     },
 
     // Cursor
@@ -50,7 +50,7 @@ export default defineNuxtConfig({
 
     // Scrollbar customizada
     customScrollbar: {
-      enabled: true,
+      //enabled: true,
       //width: "10px",
       //borderRadius: "8px",
       //borderWidth: "2px",
@@ -64,10 +64,10 @@ export default defineNuxtConfig({
 
     // Cores customizadas
     colorThemes: {
-      //dark: {
+      // dark: {
       //  primary: '#FF0000',
       //  secondary: '#00FF00',
-      //}
-    }
+      // }
+    },
   },
 })

@@ -1,84 +1,111 @@
-<!--
-Get your module up and running quickly.
+```markdown
+# @venix/nuxt-theme
 
-Find and replace all on all files (CMD+SHIFT+F):
-- Name: My Module
-- Package name: my-module
-- Description: My new Nuxt module
--->
+[![npm version](https://badge.fury.io/js/@venix%2Fnuxt-theme.svg)](https://badge.fury.io/js/@venix%2Fnuxt-theme)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-# My Module
-
-[![npm version][npm-version-src]][npm-version-href]
-[![npm downloads][npm-downloads-src]][npm-downloads-href]
-[![License][license-src]][license-href]
-[![Nuxt][nuxt-src]][nuxt-href]
-
-My new Nuxt module for doing amazing things.
-
-- [✨ &nbsp;Release Notes](/CHANGELOG.md)
-<!-- - [🏀 Online playground](https://stackblitz.com/github/your-org/my-module?file=playground%2Fapp.vue) -->
-<!-- - [📖 &nbsp;Documentation](https://example.com) -->
+> Theme module for Nuxt with colors, typography, scrollbar and cursor customization
 
 ## Features
 
-<!-- Highlight some of the features your module provide here -->
-- ⛰ &nbsp;Foo
-- 🚠 &nbsp;Bar
-- 🌲 &nbsp;Baz
+- 🎨 **Color themes** with dark/light mode
+- 🌐 **Internationalization** with automatic locale detection
+- 📝 **Custom typography** with font faces
+- 🖱️ **Custom cursor** support
+- 📜 **Custom scrollbar** styling
+- 🌈 **Seasonal themes** (Carnival, Christmas, Halloween)
+- 💾 **Persistence** with cookies
+- 🔄 **System preference** detection
 
 ## Quick Setup
 
-Install the module to your Nuxt application with one command:
+### 1. Install the module:
 
 ```bash
-npx nuxt module add my-module
+npm install @venix/nuxt-theme
 ```
 
-That's it! You can now use My Module in your Nuxt app ✨
+### 2. Add to `nuxt.config.ts`:
 
-
-## Contribution
-
-<details>
-  <summary>Local development</summary>
+```typescript
+export default defineNuxtConfig({
+  modules: ['@venix/nuxt-theme'],
   
-  ```bash
-  # Install dependencies
-  npm install
-  
-  # Generate type stubs
-  npm run dev:prepare
-  
-  # Develop with the playground
-  npm run dev
-  
-  # Build the playground
-  npm run dev:build
-  
-  # Run ESLint
-  npm run lint
-  
-  # Run Vitest
-  npm run test
-  npm run test:watch
-  
-  # Release new version
-  npm run release
-  ```
+  venixTheme: {
+    // Enable features
+    typography: true,
+    customScrollbar: true,
+    customCursor: true,
+    colors: true,
+    applyColors: true,
+    
+    // Customize themes
+    colorThemes: {
+      dark: {
+        primary: '#FF6B6B',
+      }
+    }
+  }
+})
+```
 
-</details>
+### 3. Use in your app:
 
+```vue
+<template>
+  <div>
+    <button @click="theme_toggle('dark')">Dark</button>
+    <button @click="theme_toggle('light')">Light</button>
+  </div>
+</template>
 
-<!-- Badges -->
-[npm-version-src]: https://img.shields.io/npm/v/my-module/latest.svg?style=flat&colorA=020420&colorB=00DC82
-[npm-version-href]: https://npmjs.com/package/my-module
+<script setup>
+const { theme_toggle } = useTheme()
+</script>
+```
 
-[npm-downloads-src]: https://img.shields.io/npm/dm/my-module.svg?style=flat&colorA=020420&colorB=00DC82
-[npm-downloads-href]: https://npm.chart.dev/my-module
+## Configuration
 
-[license-src]: https://img.shields.io/npm/l/my-module.svg?style=flat&colorA=020420&colorB=00DC82
-[license-href]: https://npmjs.com/package/my-module
+### Module Options
 
-[nuxt-src]: https://img.shields.io/badge/Nuxt-020420?logo=nuxt
-[nuxt-href]: https://nuxt.com
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `theme` | `string` | - | Path to custom theme JSON |
+| `typography` | `boolean \| object` | `true` | Enable/configure typography |
+| `customScrollbar` | `boolean \| object` | `true` | Enable/configure scrollbar |
+| `customCursor` | `boolean \| object` | `true` | Enable/configure cursor |
+| `colors` | `boolean` | `true` | Enable colors |
+| `applyColors` | `boolean` | `true` | Auto-apply colors |
+| `colorThemes` | `object` | `{}` | Customize color themes |
+| `localeCookie` | `string` | `'i18n_redirected'` | Cookie name for locale |
+| `defaultLocale` | `string` | `'en-US'` | Fallback locale |
+| `locale` | `string` | - | Force specific locale |
+
+## Documentation
+
+- [Online documentation](https://github.com/seu-usuario/nuxt-theme)
+- [Examples](./playground)
+
+## Development
+
+```bash
+# Install dependencies
+pnpm install
+
+# Run playground
+pnpm dev
+
+# Run tests
+pnpm test
+
+# Build for production
+pnpm prepack
+
+# Lint
+pnpm lint
+```
+
+## License
+
+MIT
+```
