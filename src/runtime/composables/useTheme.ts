@@ -1,7 +1,7 @@
 // runtime/composables/useTheme.ts
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useRuntimeConfig } from '#app'
-import themeData from '../../app/theme.json'
+import themeData from '../theme.json' with { type: 'json' }
 import type { ThemeConfig } from '../../app/types'
 import { DEFAULT_THEME, DEFAULT_LOCALE } from '../../app/constants'
 import { useThemeCookies } from './useThemeCookies'

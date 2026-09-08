@@ -1,5 +1,5 @@
 export default defineNuxtConfig({
-  modules: ['@venix/nuxt-theme'],
+  modules: ['@venix-sistemas/nuxt-theme'],
   devtools: { enabled: true },
   compatibilityDate: 'latest',
 

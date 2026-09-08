@@ -1,6 +1,6 @@
 {
-  "name": "@venix/nuxt-theme",
-  "version": "1.0.0",
+  "name": "@venix-sistemas/nuxt-theme",
+  "version": "0.1.1",
   "description": "Complete color system for Nuxt: seasonal colors, automatic theme, SSR, Cookie Policy, cursor, scrollbar, etc...",
   "keywords": [
     "nuxt",
@@ -16,10 +16,15 @@
   "type": "module",
   "author": "Vinicius da Silva Viana <contato@venixsistemas.com>",
   "repository": "Venix-Sistemas/nuxt-theme",
+  "private": false,
+  "publishConfig": {
+    "access": "public"
+  },
   "exports": {
     ".": {
       "types": "./dist/types.d.mts",
-      "import": "./dist/module.mjs"
+      "import": "./dist/module.mjs",
+      "exports": "./src/module.ts"
     }
   },
   "main": "./dist/module.mjs",

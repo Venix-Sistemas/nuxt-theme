@@ -1,5 +1,4 @@
-// src/app/load.ts
-import defaultTheme from '../theme.json'
+import defaultTheme from '../../runtime/theme.json' with { type: 'json' }
 import type { ThemeConfig } from '../types'
 import { DEFAULT_LOCALE } from '../constants'
 import { normalizeLocale } from './normalize'

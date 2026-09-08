@@ -23,7 +23,7 @@ export interface ModuleOptions {
 
 export default defineNuxtModule<ModuleOptions>({
   meta: {
-    name: '@venix/nuxt-theme',
+    name: '@venix-sistemas/nuxt-theme',
     configKey: 'venixTheme',
   },
   defaults: {

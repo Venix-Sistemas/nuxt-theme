@@ -1,5 +1,5 @@
 ```markdown
-# @venix/nuxt-theme
+# @venix-sistemas/nuxt-theme
 
 [![npm version](https://badge.fury.io/js/@venix%2Fnuxt-theme.svg)](https://badge.fury.io/js/@venix%2Fnuxt-theme)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -22,14 +22,14 @@
 ### 1. Install the module:
 
 ```bash
-npm install @venix/nuxt-theme
+npm install @venix-sistemas/nuxt-theme
 ```
 
 ### 2. Add to `nuxt.config.ts`:
 
 ```typescript
 export default defineNuxtConfig({
-  modules: ['@venix/nuxt-theme'],
+  modules: ['@venix-sistemas/nuxt-theme'],
   
   venixTheme: {
     // Enable features
