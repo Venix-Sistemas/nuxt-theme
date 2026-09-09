@@ -6,12 +6,18 @@ import type { ThemeConfig } from '../../app/types'
 import { DEFAULT_LOCALE } from '../../app/constants'
 import { normalizeLocale, extractFirstLocale } from '../../app/utils/normalize'
 
+export interface UseThemeLocaleOptions {
+  enabled?: boolean
+  forcedLocale?: string
+  defaultLocale?: string
+}
+
 export const useThemeLocale = (
   theme: ThemeConfig,
-  localeCookie: Ref<string | undefined>, // Agora Ref está importado
-  forcedLocale?: string,
-  defaultLocale?: string,
+  localeCookie: Ref<string | undefined>,
+  options: UseThemeLocaleOptions = {},
 ) => {
+  const { enabled = true, forcedLocale, defaultLocale } = options
   const headers = useRequestHeaders(['accept-language'])
   const fallbackLocale = defaultLocale || DEFAULT_LOCALE
 
@@ -49,6 +55,9 @@ export const useThemeLocale = (
     // 1. Locale forçado via config
     if (forcedLocale) return findBestLocale(forcedLocale)
 
+    // Módulo de tradução desabilitado: não detecta nem sincroniza cookie/headers
+    if (!enabled) return fallbackLocale
+
     // 2. Cookie de idioma
     if (localeCookie.value) return findBestLocale(localeCookie.value)
 
@@ -78,7 +87,7 @@ export const useThemeLocale = (
 
   // Atualiza o locale quando o cookie mudar
   watch(localeCookie, (newLocale) => {
-    if (newLocale && !forcedLocale) {
+    if (enabled && newLocale && !forcedLocale) {
       currentLocale.value = normalizeLocale(newLocale)
     }
   })
@@ -106,7 +115,7 @@ export const useThemeLocale = (
 
   const setLocale = (locale: string) => {
     currentLocale.value = normalizeLocale(locale)
-    if (!forcedLocale) {
+    if (enabled && !forcedLocale) {
       localeCookie.value = normalizeLocale(locale)
     }
   }

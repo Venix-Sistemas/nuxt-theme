@@ -12,9 +12,10 @@ declare module '@nuxt/schema' {
       locale: string
       enabled: {
         typography: boolean
-        customScrollbar: boolean
-        customCursor: boolean
-        colors: boolean
+        scrollbar: boolean
+        cursor: boolean
+        color: boolean
+        translation: boolean
       }
     }
   }

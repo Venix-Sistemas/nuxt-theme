@@ -5,3 +5,4 @@ export {
   normalizeColor,
   normalizeThemeName,
 } from './normalize'
+export { resolveFeatureOption } from './options'

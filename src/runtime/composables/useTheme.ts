@@ -40,12 +40,11 @@ export const useTheme = () => {
   const cookies = useThemeCookies()
 
   // Locale
-  const locale = useThemeLocale(
-    theme,
-    cookies.localeCookie,
-    themeConfig?.locale,
-    themeConfig?.defaultLocale || DEFAULT_LOCALE,
-  )
+  const locale = useThemeLocale(theme, cookies.localeCookie, {
+    enabled: themeConfig?.enabled?.translation !== false,
+    forcedLocale: themeConfig?.locale,
+    defaultLocale: themeConfig?.defaultLocale || DEFAULT_LOCALE,
+  })
 
   // Temas sazonais
   const seasonal = useThemeSeasonal(theme)

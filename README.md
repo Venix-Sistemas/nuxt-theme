@@ -43,17 +43,23 @@ export default defineNuxtConfig({
   modules: ['@venix-sistemas/nuxt-theme'],
 
   venixTheme: {
-    typography: true,
-    customScrollbar: true,
-    customCursor: true,
-    colors: true,
-    applyColors: true,
+    translation: {
+      locale: 'pt-BR',
+      defaultLocale: 'en-US',
+      cookieSync: 'i18n_redirected',
+    },
 
-    colorThemes: {
-      dark: {
-        primary: '#FF6B6B',
+    color: {
+      themes: {
+        dark: {
+          primary: '#FF6B6B',
+        },
       },
     },
+
+    scrollbar: true,
+    cursor: true,
+    typography: true,
   },
 })
 ```
@@ -84,31 +90,49 @@ const { theme_toggle } = useTheme()
 
 ### Module Options
 
-| Option            | Type                | Default             | Description                                |
-| ----------------- | ------------------- | ------------------- | ------------------------------------------ |
-| `theme`           | `string`            | —                   | Path to a custom theme JSON file           |
-| `typography`      | `boolean \| object` | `true`              | Enable or configure typography             |
-| `customScrollbar` | `boolean \| object` | `true`              | Enable or configure the custom scrollbar   |
-| `customCursor`    | `boolean \| object` | `true`              | Enable or configure the custom cursor      |
-| `colors`          | `boolean`           | `true`              | Enable the color system                    |
-| `applyColors`     | `boolean`           | `true`              | Automatically apply theme colors           |
-| `colorThemes`     | `object`            | `{}`                | Configure custom color themes              |
-| `localeCookie`    | `string`            | `'i18n_redirected'` | Cookie used to persist the selected locale |
-| `defaultLocale`   | `string`            | `'en-US'`           | Default fallback locale                    |
-| `locale`          | `string`            | —                   | Force a specific locale                    |
+Every feature (`translation`, `color`, `scrollbar`, `cursor`, `typography`) is configured through a single key that accepts either a `boolean` (quick enable/disable) or a config object (which also enables the feature):
+
+| Option        | Type                 | Default | Description                                    |
+| ------------- | -------------------- | ------- | ----------------------------------------------- |
+| `theme`       | `string`             | —       | Path to a custom theme JSON file                |
+| `translation` | `boolean \| object`  | `true`  | Enable or configure locale detection/i18n       |
+| `color`       | `boolean \| object`  | `true`  | Enable or configure the color system            |
+| `scrollbar`   | `boolean \| object`  | `true`  | Enable or configure the custom scrollbar        |
+| `cursor`      | `boolean \| object`  | `true`  | Enable or configure the custom cursor           |
+| `typography`  | `boolean \| object`  | `true`  | Enable or configure typography                  |
+
+#### `translation` object
+
+| Property       | Type      | Default              | Description                                       |
+| -------------- | --------- | -------------------- | -------------------------------------------------- |
+| `locale`       | `string`  | —                     | Force a specific locale                            |
+| `defaultLocale`| `string`  | `'en-US'`             | Default fallback locale                            |
+| `cookieSync`   | `string`  | `'i18n_redirected'`   | Cookie used to persist/sync the selected locale    |
+
+Setting `translation: false` fully disables locale auto-detection and cookie syncing — useful if another module (e.g. `@nuxtjs/i18n`) already owns that cookie.
+
+#### `color` object
+
+| Property      | Type      | Default  | Description                                          |
+| ------------- | --------- | -------- | ----------------------------------------------------- |
+| `apply`       | `boolean` | `true`   | Automatically apply the resolved theme (`data-theme`) |
+| `defaultColor`| `string`  | `'dark'` | Name of the theme used when no preference is set      |
+| `themes`      | `object`  | `{}`     | Override or add custom color themes                   |
 
 ## Themes
 
 The module supports dark and light themes and can be extended with custom color configurations.
 
 ```typescript
-colorThemes: {
-  dark: {
-    primary: '#FF6B6B',
-  },
+color: {
+  themes: {
+    dark: {
+      primary: '#FF6B6B',
+    },
 
-  light: {
-    primary: '#FF6B6B',
+    light: {
+      primary: '#FF6B6B',
+    },
   },
 }
 ```
