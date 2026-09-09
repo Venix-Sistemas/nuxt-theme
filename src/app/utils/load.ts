@@ -1,4 +1,4 @@
-import defaultTheme from '../../runtime/theme.json' with { type: 'json' }
+import defaultTheme from '../../app/theme.json' with { type: 'json' }
 import type { ThemeConfig } from '../types'
 import { DEFAULT_LOCALE } from '../constants'
 import { normalizeLocale } from './normalize'

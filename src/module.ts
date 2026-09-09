@@ -41,7 +41,7 @@ export default defineNuxtModule<ModuleOptions>({
     const resolver = createResolver(import.meta.url)
 
     // 1. Registra assets públicos
-    registerPublicAssets(nuxt)
+    registerPublicAssets(nuxt, resolver)
 
     // 2. Carrega e customiza o tema
     const baseTheme = loadTheme(options.theme)
@@ -62,7 +62,7 @@ export default defineNuxtModule<ModuleOptions>({
     registerThemeCSS(nuxt, theme, options)
 
     // 6. Registra plugins
-    registerThemePlugins(nuxt, shouldApplyColors)
+    registerThemePlugins(nuxt, resolver, shouldApplyColors)
 
     // 7. Configura runtimeConfig
     nuxt.options.runtimeConfig.public.venixTheme = {

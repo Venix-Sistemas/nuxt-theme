@@ -11,8 +11,13 @@
         <h2>Seletor de Temas</h2>
         <client-only>
           <div class="theme-buttons">
-            <button v-for="item in themes" :key="item.value" :class="{ active: isActive(item) }" class="theme-button"
-              @click="theme_toggle(item.value)">
+            <button
+              v-for="item in themes"
+              :key="item.value"
+              :class="{ active: isActive(item) }"
+              class="theme-button"
+              @click="theme_toggle(item.value)"
+            >
               <span>{{ item.icon }} {{ item.name }}</span>
             </button>
           </div>
@@ -24,8 +29,15 @@
         <h2>Paleta de Cores - {{ currentThemeName }}</h2>
         <client-only>
           <div class="color-grid">
-            <div v-for="color in colorList" :key="color.name" class="color-card">
-              <div class="color-preview" :style="{ backgroundColor: color.value }" />
+            <div
+              v-for="color in colorList"
+              :key="color.name"
+              class="color-card"
+            >
+              <div
+                class="color-preview"
+                :style="{ backgroundColor: color.value }"
+              />
               <span class="color-name">{{ formatColorName(color.name) }}</span>
               <code class="color-value">{{ color.value }}</code>
             </div>
@@ -37,7 +49,11 @@
       <section class="section">
         <h2>Scroll Vertical</h2>
         <div class="scroll-vertical">
-          <div v-for="i in 20" :key="`vertical-${i}`" class="scroll-item">
+          <div
+            v-for="i in 20"
+            :key="`vertical-${i}`"
+            class="scroll-item"
+          >
             Item vertical {{ i }}
           </div>
         </div>
@@ -47,7 +63,11 @@
       <section class="section">
         <h2>Scroll Horizontal</h2>
         <div class="scroll-horizontal">
-          <div v-for="i in 20" :key="`horizontal-${i}`" class="scroll-item-horizontal">
+          <div
+            v-for="i in 20"
+            :key="`horizontal-${i}`"
+            class="scroll-item-horizontal"
+          >
             Item {{ i }}
           </div>
         </div>
@@ -58,10 +78,16 @@
         <h2>Ações</h2>
         <client-only>
           <div class="actions">
-            <button class="action-button" @click="toggleTheme">
+            <button
+              class="action-button"
+              @click="toggleTheme"
+            >
               Alternar Light/Dark
             </button>
-            <button class="action-button" @click="changePrimaryColor">
+            <button
+              class="action-button"
+              @click="changePrimaryColor"
+            >
               Mudar Cor Primária
             </button>
           </div>

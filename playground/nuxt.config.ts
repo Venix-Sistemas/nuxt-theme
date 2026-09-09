@@ -5,7 +5,7 @@ export default defineNuxtConfig({
 
   venixTheme: {
 
-    //locale: 'pt',
+    // locale: 'pt',
 
     // Tipografia customizada
     typography: {
@@ -50,16 +50,16 @@ export default defineNuxtConfig({
 
     // Scrollbar customizada
     customScrollbar: {
-      //enabled: true,
-      //width: "10px",
-      //borderRadius: "8px",
-      //borderWidth: "2px",
-      //colors: {
+      // enabled: true,
+      // width: "10px",
+      // borderRadius: "8px",
+      // borderWidth: "2px",
+      // colors: {
       //  thumb: "primary",
       //  thumbHover: "secondary",
       //  track: "background2",
       //  border: "background3"
-      //}
+      // }
     },
 
     // Cores customizadas

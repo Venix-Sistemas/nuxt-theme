@@ -1,6 +1,6 @@
 // runtime/plugins/theme-init.server.ts
 import { defineNuxtPlugin, useRuntimeConfig, useCookie, useHead } from '#app'
-import themeData from '../theme.json' with { type: 'json' }
+import themeData from '../../app/theme.json' with { type: 'json' }
 import type { ThemeConfig } from '../../app/types'
 
 export default defineNuxtPlugin({
