@@ -1,4 +1,4 @@
-// src/app/types/runtime-config.ts
+// src/shared/types/runtime-config.ts
 import type { ThemeColors } from './colors'
 
 declare module '@nuxt/schema' {
@@ -10,12 +10,20 @@ declare module '@nuxt/schema' {
       localeCookie: string
       defaultLocale: string
       locale: string
+      iconFormat: 'emote' | 'css' | 'svg'
+      icon: {
+        aliases: Record<string, string>
+      }
       enabled: {
         typography: boolean
         scrollbar: boolean
         cursor: boolean
         color: boolean
         translation: boolean
+        manageHtmlLang: boolean
+        unocss: boolean
+        vuetify: boolean
+        icon: boolean
       }
     }
   }
@@ -23,8 +31,8 @@ declare module '@nuxt/schema' {
 
 declare global {
   interface Window {
-    __INITIAL_THEME__?: string
-    __INITIAL_LOCALE__?: string
+    __VENIX_INITIAL_THEME__?: string
+    __VENIX_INITIAL_LOCALE__?: string
   }
 }
 

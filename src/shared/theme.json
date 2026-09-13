@@ -56,7 +56,11 @@
                     "pt-BR": "Automático",
                     "en-US": "Automatic"
                 },
-                "icon": "🎨"
+                "icon": {
+                    "emote": "🎨",
+                    "css": "line-md:light-dark",
+                    "svg": "line-md:light-dark-loop"
+                }
             },
             "dark": {
                 "dark": true,
@@ -74,7 +78,11 @@
                     "pt-BR": "Escuro",
                     "en-US": "Dark"
                 },
-                "icon": "🌙"
+                "icon": {
+                    "emote": "🌙",
+                    "css": "mdi:moon-and-stars",
+                    "svg": "line-md:moon-filled-loop"
+                }
             },
             "light": {
                 "dark": false,
@@ -92,7 +100,11 @@
                     "pt-BR": "Claro",
                     "en-US": "Light"
                 },
-                "icon": "☀️"
+                "icon": {
+                    "emote": "☀️",
+                    "css": "mdi:white-balance-sunny",
+                    "svg": "line-md:sunny-filled-loop"
+                }
             },
             "carnaval": {
                 "dark": true,
@@ -115,7 +127,11 @@
                     "pt-BR": "Carnaval",
                     "en-US": "Carnival"
                 },
-                "icon": "🎭"
+                "icon": {
+                    "emote": "🎭",
+                    "css": "mdi:emoticon-excited-outline",
+                    "svg": "line-md:emoji-grin"
+                }
             },
             "natal": {
                 "dark": true,
@@ -138,7 +154,11 @@
                     "pt-BR": "Natal",
                     "en-US": "Christmas"
                 },
-                "icon": "🎄"
+                "icon": {
+                    "emote": "🎄",
+                    "css": "mdi:pine-tree-variant",
+                    "svg": "line-md:star-filled"
+                }
             },
             "halloween": {
                 "dark": true,
@@ -161,7 +181,11 @@
                     "pt-BR": "Dia das Bruxas",
                     "en-US": "Halloween"
                 },
-                "icon": "🎃"
+                "icon": {
+                    "emote": "🎃",
+                    "css": "mdi:halloween",
+                    "svg": "line-md:emoji-frown"
+                }
             }
         }
     },

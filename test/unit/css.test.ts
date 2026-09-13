@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
-import { processTheme } from '../../src/app/css'
-import { generateThemeVars } from '../../src/app/css/colors'
-import { loadTheme } from '../../src/app/utils/load'
+import { processTheme } from '../../src/shared/css'
+import { generateThemeVars } from '../../src/shared/css/colors'
+import { loadTheme } from '../../src/shared/utils/load'
 
 describe('processTheme', () => {
   const theme = loadTheme()
@@ -35,6 +35,17 @@ describe('processTheme', () => {
   it('deve gerar CSS de scrollbar se habilitado', () => {
     const css = processTheme(theme, { customScrollbar: true })
     expect(css).toContain('::-webkit-scrollbar')
+  })
+
+  it('deve gerar CSS de transição de tema junto com as cores', () => {
+    const css = processTheme(theme, { colors: true })
+    expect(css).toContain('::view-transition-old(root)')
+    expect(css).toContain('::view-transition-new(root)')
+  })
+
+  it('deve desligar pointer-events em toda a árvore de pseudo-elementos da transição, para não travar cursor/hover do conteúdo real', () => {
+    const css = processTheme(theme, { colors: true })
+    expect(css).toMatch(/::view-transition,\n::view-transition-group\(\*\),\n::view-transition-image-pair\(\*\),\n::view-transition-old\(\*\),\n::view-transition-new\(\*\)\s*\{[^}]*pointer-events:\s*none\s*!important/)
   })
 })
 

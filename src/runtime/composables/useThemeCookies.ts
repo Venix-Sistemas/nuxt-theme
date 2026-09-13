@@ -4,12 +4,13 @@ import {
   THEME_PREFERENCE_COOKIE,
   THEME_RESOLVED_COOKIE,
   DEFAULT_LOCALE_COOKIE_NAME,
-} from '../../app/constants'
+} from '../../shared/constants'
+import { hasCookieConsent } from '../../shared/utils/consent'
 
-export const useThemeCookies = () => {
+export const useThemeCookies = (localeCookieName: string = DEFAULT_LOCALE_COOKIE_NAME) => {
   const preferenceCookie = useCookie<string>(THEME_PREFERENCE_COOKIE)
   const resolvedCookie = useCookie<string>(THEME_RESOLVED_COOKIE)
-  const localeCookie = useCookie<string>(DEFAULT_LOCALE_COOKIE_NAME)
+  const localeCookie = useCookie<string>(localeCookieName)
 
   const removeCookie = (name: string) => {
     if (typeof document !== 'undefined') {
@@ -17,7 +18,11 @@ export const useThemeCookies = () => {
     }
   }
 
-  const enablePersistence = (preference: string, resolved: string) => {
+  // Só grava se o app consumidor já registrou consentimento de cookies
+  // funcionais — chamado tanto automaticamente (a cada troca de tema) quanto
+  // explicitamente via `persistence.enable()`.
+  const persistIfConsented = (preference: string, resolved: string) => {
+    if (!hasCookieConsent()) return
     preferenceCookie.value = preference
     resolvedCookie.value = resolved
   }
@@ -31,7 +36,7 @@ export const useThemeCookies = () => {
     preferenceCookie,
     resolvedCookie,
     localeCookie,
-    enablePersistence,
+    persistIfConsented,
     disablePersistence,
   }
 }

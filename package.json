@@ -1,6 +1,6 @@
 {
   "name": "@venix-sistemas/nuxt-theme",
-  "version": "0.1.5",
+  "version": "1.0.0-alpha.1",
   "description": "Complete color system for Nuxt: seasonal colors, automatic theme, SSR, Cookie Policy, cursor, scrollbar, etc...",
   "keywords": [
     "nuxt",
@@ -26,7 +26,7 @@
       "import": "./dist/module.mjs",
       "exports": "./src/module.ts"
     },
-    "./theme.json": "./dist/app/theme.json"
+    "./theme.json": "./dist/shared/theme.json"
   },
   "main": "./dist/module.mjs",
   "typesVersions": {
@@ -54,6 +54,8 @@
     "test:types": "vue-tsc --noEmit && cd playground && vue-tsc --noEmit"
   },
   "dependencies": {
+    "@iconify-json/line-md": "^1.2.16",
+    "@nuxt/icon": "^2.5.1",
     "@nuxt/kit": "^4.5.2"
   },
   "devDependencies": {

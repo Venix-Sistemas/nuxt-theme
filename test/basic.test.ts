@@ -1,8 +1,8 @@
 import { fileURLToPath } from 'node:url'
 import { describe, it, expect } from 'vitest'
 import { setup, $fetch } from '@nuxt/test-utils/e2e'
-import { loadTheme } from '../src/app/utils/load'
-import { processTheme } from '../src/app/css'
+import { loadTheme } from '../src/shared/utils/load'
+import { processTheme } from '../src/shared/css'
 
 describe('nuxt-theme module', () => {
   // Teste E2E

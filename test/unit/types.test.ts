@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import type { ThemeColors } from '../../src/app/types'
+import type { ThemeColors } from '../../src/shared/types'
 
 describe('types', () => {
   it('ThemeColors deve aceitar propriedades opcionais', () => {

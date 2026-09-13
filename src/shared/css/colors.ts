@@ -1,4 +1,4 @@
-// src/app/css/colors.ts
+// src/shared/css/colors.ts
 import type { ThemeColors } from '../types'
 import { NON_COLOR_PROPERTIES } from '../constants'
 
@@ -18,7 +18,7 @@ export function generateThemeVars(mode: string, colors: ThemeColors): string {
     + `/* ============================================ */\n\n`
     + `:root[data-theme='${mode}'] {\n`
     + `  color-scheme: ${colorScheme};\n`
-    + `  --color-schema: ${colorScheme === 'dark' ? '#000000' : '#FFFFFF'};\n`
+    + `  --color-scheme: ${colorScheme === 'dark' ? '#000000' : '#FFFFFF'};\n`
     + `  --color-inverse: ${inverseColor};\n`
     + colorVars + '\n'
     + `}\n`

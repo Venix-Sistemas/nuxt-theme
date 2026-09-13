@@ -1,0 +1,11 @@
+import { defineConfig } from 'vitest/config'
+
+export default defineConfig({
+  test: {
+    // Sem isso, o glob padrão do Vitest também pega arquivos de teste dentro
+    // de worktrees git (ex.: `.claude/worktrees/<nome>/test/...`, criadas por
+    // sessões/agentes do Claude Code) e outras pastas de build, quebrando a
+    // suíte por causa de `tsconfig.json`/config ausentes nesses diretórios.
+    exclude: ['**/node_modules/**', '**/dist/**', '**/.nuxt/**', '**/.claude/**'],
+  },
+})

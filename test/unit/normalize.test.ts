@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { normalizeLocale, extractFirstLocale, normalizeColor, normalizeThemeName } from '../../src/app/utils/normalize'
+import { normalizeLocale, extractFirstLocale, normalizeColor, normalizeThemeName } from '../../src/shared/utils/normalize'
 
 describe('normalizeLocale', () => {
   it('deve normalizar "pt" para "pt-BR"', () => {

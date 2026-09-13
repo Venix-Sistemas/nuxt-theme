@@ -1,5 +1,5 @@
 // runtime/composables/useThemeSeasonal.ts
-import type { ThemeConfig } from '../../app/types'
+import type { ThemeConfig } from '../../shared/types'
 
 export const useThemeSeasonal = (theme: ThemeConfig) => {
   const getActiveSeasonalTheme = (prefersDark?: boolean): string | null => {

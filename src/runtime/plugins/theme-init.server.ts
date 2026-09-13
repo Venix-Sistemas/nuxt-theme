@@ -1,7 +1,9 @@
 // runtime/plugins/theme-init.server.ts
 import { defineNuxtPlugin, useRuntimeConfig, useCookie, useHead } from '#app'
-import themeData from '../../app/theme.json' with { type: 'json' }
-import type { ThemeConfig } from '../../app/types'
+import themeData from '../../shared/theme.json' with { type: 'json' }
+import type { ThemeConfig } from '../../shared/types'
+import { THEME_PREFERENCE_COOKIE, THEME_RESOLVED_COOKIE, DEFAULT_LOCALE_COOKIE_NAME, DEFAULT_LOCALE } from '../../shared/constants'
+import { useThemeLocale } from '../composables/useThemeLocale'
 
 export default defineNuxtPlugin({
   name: 'venix-theme-init-server',
@@ -10,8 +12,8 @@ export default defineNuxtPlugin({
     const config = useRuntimeConfig()
     const themeConfig = config.public.venixTheme
 
-    const resolvedCookie = useCookie<string>('theme-resolved')
-    const preferenceCookie = useCookie<string>('theme-preference')
+    const resolvedCookie = useCookie<string>(THEME_RESOLVED_COOKIE)
+    const preferenceCookie = useCookie<string>(THEME_PREFERENCE_COOKIE)
 
     const theme: ThemeConfig = {
       ...themeData as ThemeConfig,
@@ -35,12 +37,26 @@ export default defineNuxtPlugin({
       resolvedTheme = preferenceCookie.value
     }
 
+    const htmlAttrs: Record<string, string> = {
+      'data-theme': resolvedTheme,
+      'class': resolvedTheme,
+    }
+
+    // `lang` precisa refletir o locale resolvido (WCAG 3.1.1) — mas só quando
+    // habilitado explicitamente (ver `translation.manageHtmlLang` e o mesmo
+    // comentário em useVenixTheme.ts): se o projeto já usa um módulo de i18n
+    // de rotas, é ele quem deve ser o dono desse atributo.
+    if (themeConfig?.enabled?.manageHtmlLang) {
+      const localeCookie = useCookie<string>(themeConfig?.localeCookie || DEFAULT_LOCALE_COOKIE_NAME)
+      const locale = useThemeLocale(theme, localeCookie, {
+        enabled: themeConfig?.enabled?.translation !== false,
+        forcedLocale: themeConfig?.locale,
+        defaultLocale: themeConfig?.defaultLocale || DEFAULT_LOCALE,
+      })
+      htmlAttrs.lang = locale.currentLocale.value
+    }
+
     // Aplica no SSR diretamente
-    useHead({
-      htmlAttrs: {
-        'data-theme': resolvedTheme,
-        'class': resolvedTheme,
-      },
-    })
+    useHead({ htmlAttrs })
   },
 })

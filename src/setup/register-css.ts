@@ -1,8 +1,8 @@
 // src/setup/register-css.ts
 import { addTemplate } from '@nuxt/kit'
 import type { Nuxt } from '@nuxt/schema'
-import type { ThemeConfig } from '../app/types'
-import { processTheme } from '../app/css'
+import type { ThemeConfig } from '../shared/types'
+import { processTheme } from '../shared/css'
 
 export function registerThemeCSS(nuxt: Nuxt, theme: ThemeConfig) {
   const css = processTheme(theme)

@@ -1,7 +1,7 @@
 // src/setup/customize-theme.ts
-import type { ThemeConfig, ThemeColors } from '../app/types'
+import type { ThemeConfig, ThemeColors } from '../shared/types'
 import type { ModuleOptions } from '../module'
-import { resolveFeatureOption } from '../app/utils/options'
+import { resolveFeatureOption } from '../shared/utils/options'
 
 export function customizeTheme(baseTheme: ThemeConfig, options: ModuleOptions): ThemeConfig {
   const customized = JSON.parse(JSON.stringify(baseTheme)) as ThemeConfig

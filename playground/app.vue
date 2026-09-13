@@ -1,12 +1,15 @@
 <template>
   <div class="playground">
     <header class="header">
+      <client-only>
+        <VenixThemeSwitcher class="header__switcher" />
+      </client-only>
       <h1>🎨 Nuxt Theme Playground</h1>
       <p>Teste interativo do módulo de temas</p>
     </header>
 
     <main class="content">
-      <!-- Seletor de Temas -->
+      <!-- Seletor de Temas (manual, para comparação com o VenixThemeSwitcher) -->
       <section class="section">
         <h2>Seletor de Temas</h2>
         <client-only>
@@ -16,13 +19,70 @@
               :key="item.value"
               :class="{ active: isActive(item) }"
               class="theme-button"
-              @click="theme_toggle(item.value)"
+              @click="theme.toggle(item.value)"
             >
-              <span>{{ item.icon }} {{ item.name }}</span>
+              <VenixIcon
+                v-if="item.icon"
+                :icon="item.icon.value"
+                :mode="item.icon.format === 'emote' ? undefined : item.icon.format"
+              />
+              <span>{{ item.name }}</span>
             </button>
           </div>
         </client-only>
       </section>
+
+      <!-- Idiomas + Consentimento de Cookies (lado a lado, logo acima) -->
+      <div class="row">
+        <section class="section row__cell">
+          <h2>Idiomas</h2>
+          <p class="lang-info">
+            Idioma (@nuxtjs/i18n): <strong>{{ i18nLocale }}</strong>
+            — Locale do tema: <strong>{{ locale.current.value }}</strong>
+          </p>
+          <div class="lang-buttons">
+            <button
+              v-for="loc in availableLocales"
+              :key="loc.code"
+              type="button"
+              class="lang-button"
+              :class="{ active: loc.code === i18nLocale }"
+              @click="setI18nLocale(loc.code)"
+            >
+              {{ loc.name }}
+            </button>
+          </div>
+        </section>
+
+        <section class="section row__cell">
+          <h2>Consentimento de Cookies</h2>
+          <client-only>
+            <p class="consent-info">
+              Consentimento: <strong>{{ persistence.hasConsent.value ? 'Concedido' : 'Não concedido' }}</strong>
+              — Cookies: <strong>{{ cookiesPresent ? 'Gravados' : 'Ausentes' }}</strong>
+            </p>
+            <div class="consent-buttons">
+              <button
+                type="button"
+                class="consent-button consent-button--grant"
+                @click="grantConsent"
+              >
+                Permitir cookies
+              </button>
+              <button
+                type="button"
+                class="consent-button consent-button--revoke"
+                @click="revokeConsent"
+              >
+                Revogar cookies
+              </button>
+            </div>
+            <p class="consent-hint">
+              Sem consentimento a troca de tema ainda funciona, só não é lembrada na próxima visita.
+            </p>
+          </client-only>
+        </section>
+      </div>
 
       <!-- Paleta de Cores -->
       <section class="section">
@@ -43,6 +103,24 @@
             </div>
           </div>
         </client-only>
+      </section>
+
+      <!-- Ícones -->
+      <section class="section">
+        <h2>Ícones (VenixIcon)</h2>
+        <div class="icon-row">
+          <div
+            v-for="item in iconSamples"
+            :key="item.label"
+            class="icon-sample"
+          >
+            <VenixIcon
+              :icon="item.icon"
+              class="icon-sample__icon"
+            />
+            <span class="icon-sample__label">{{ item.label }}</span>
+          </div>
+        </div>
       </section>
 
       <!-- Teste de Scroll Vertical -->
@@ -84,12 +162,6 @@
             >
               Alternar Light/Dark
             </button>
-            <button
-              class="action-button"
-              @click="changePrimaryColor"
-            >
-              Mudar Cor Primária
-            </button>
           </div>
         </client-only>
       </section>
@@ -98,16 +170,32 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue'
-import themeData from '../src/app/theme.json' with { type: 'json' }
+import { ref, computed, onMounted, watch, nextTick } from 'vue'
+import themeData from '../src/shared/theme.json' with { type: 'json' }
 
-const {
-  theme,
-  themes,
-  theme_toggle,
-  theme_data,
-  updateThemeColors,
-} = useTheme()
+const { theme, themes, locale, persistence } = useVenixTheme()
+
+const { locale: i18nLocale, locales: availableLocales, setLocale: setI18nLocale } = useI18n()
+
+const cookiesPresent = ref(false)
+
+const checkCookies = () => {
+  cookiesPresent.value = document.cookie.includes('venix-theme-preference=')
+}
+
+// `useCookie()` grava em `document.cookie` de forma assíncrona (via watcher),
+// então esperamos o próximo tick antes de reler os cookies no navegador.
+const grantConsent = async () => {
+  persistence.grant()
+  await nextTick()
+  checkCookies()
+}
+
+const revokeConsent = async () => {
+  persistence.revoke()
+  await nextTick()
+  checkCookies()
+}
 
 const isActive = (item: { value: string }): boolean => {
   return theme.preference.value === item.value
@@ -117,15 +205,28 @@ const activeTheme = ref('')
 
 onMounted(() => {
   activeTheme.value = theme.preference.value || 'dark'
+  checkCookies()
 })
 
-watch(() => theme.preference.value, (newTheme) => {
+watch(() => theme.preference.value, async (newTheme) => {
   activeTheme.value = newTheme || 'dark'
+  await nextTick()
+  checkCookies()
 })
 
 const currentThemeName = computed(() => {
-  return theme_data?.value?.name || activeTheme.value || 'dark'
+  return theme.data.value?.name || activeTheme.value || 'dark'
 })
+
+const customSvg = '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="currentColor" /></svg>'
+
+const iconSamples = [
+  { label: 'Iconify (line-md, animado)', icon: 'line-md:loading-loop' },
+  { label: 'Emoji', icon: '🎨' },
+  { label: 'SVG inline', icon: customSvg },
+  { label: 'Alias -> \'home\'', icon: 'home' },
+  { label: 'Alias -> \'star\' (emoji)', icon: 'star' },
+]
 
 const formatColorName = (name: string): string => {
   return name
@@ -151,29 +252,11 @@ const colorList = computed(() => {
 })
 
 const toggleTheme = () => {
-  theme_toggle()
-}
-
-const changePrimaryColor = () => {
-  const colors = ['#FF6B6B', '#4CAF50', '#2196F3', '#FF9800', '#9C27B0', '#00BCD4']
-  const randomColor = colors[Math.floor(Math.random() * colors.length)]
-
-  const currentTheme = activeTheme.value || theme.preference.value || 'dark'
-  updateThemeColors(currentTheme, {
-    primary: randomColor,
-  })
+  theme.toggle()
 }
 </script>
 
 <style>
-:root {
-  --color-primary: #FF6B6B;
-  --color-secondary: #FFB96A;
-  --color-background: #0F0F0F;
-  --color-background2: #191919;
-  --color-background3: #232323;
-}
-
 * {
   margin: 0;
   padding: 0;
@@ -192,10 +275,17 @@ body {
 }
 
 .header {
+  position: relative;
   text-align: center;
-  padding: 2rem;
+  padding: 1.25rem 1.5rem;
   background: var(--color-background2);
   border-bottom: 1px solid var(--color-background3);
+}
+
+.header__switcher {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
 }
 
 .header h1 {
@@ -206,20 +296,32 @@ body {
 .content {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 1.25rem;
 }
 
 .section {
   background: var(--color-background2);
   border-radius: 12px;
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
   border: 1px solid var(--color-background3);
 }
 
 .section h2 {
-  margin-bottom: 1rem;
+  margin-bottom: 0.75rem;
+  font-size: 1.05rem;
   color: var(--color-secondary);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.row__cell {
+  margin-bottom: 0;
 }
 
 .theme-buttons {
@@ -229,7 +331,7 @@ body {
 }
 
 .theme-button {
-  padding: 0.75rem 1.25rem;
+  padding: 0.5rem 1rem;
   border: 2px solid var(--color-background3);
   border-radius: 8px;
   background: transparent;
@@ -250,34 +352,34 @@ body {
 
 .color-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(85px, 1fr));
+  gap: 0.5rem;
 }
 
 .color-card {
   background: var(--color-background3);
   border-radius: 8px;
-  padding: 0.75rem;
+  padding: 0.4rem;
   text-align: center;
 }
 
 .color-preview {
   width: 100%;
-  height: 100px;
+  height: 40px;
   border-radius: 6px;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.35rem;
   border: 2px solid var(--color-background3);
 }
 
 .color-name {
   display: block;
-  font-size: 0.9rem;
+  font-size: 0.7rem;
   color: var(--color-secondary);
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.15rem;
 }
 
 .color-value {
-  font-size: 0.8rem;
+  font-size: 0.65rem;
   color: var(--color-primary);
   font-family: monospace;
 }
@@ -311,18 +413,18 @@ body {
 
 /* Scroll Vertical */
 .scroll-vertical {
-  height: 300px;
+  height: 160px;
   overflow-y: auto;
   background: var(--color-background3);
   border-radius: 8px;
-  padding: 1rem;
+  padding: 0.75rem;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.4rem;
 }
 
 .scroll-item {
-  padding: 1rem;
+  padding: 0.6rem;
   background: var(--color-background2);
   border-radius: 4px;
   color: var(--color-primary);
@@ -335,20 +437,131 @@ body {
   overflow-x: auto;
   background: var(--color-background3);
   border-radius: 8px;
-  padding: 1rem;
+  padding: 0.75rem;
   display: flex;
-  gap: 0.5rem;
+  gap: 0.4rem;
   white-space: nowrap;
 }
 
 .scroll-item-horizontal {
-  padding: 2rem;
+  padding: 0.75rem 1rem;
   background: var(--color-background2);
   border-radius: 4px;
   color: var(--color-primary);
   text-align: center;
-  min-width: 200px;
+  min-width: 140px;
   flex-shrink: 0;
+}
+
+.icon-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.icon-sample {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.icon-sample__icon {
+  font-size: 1.5rem;
+  color: var(--color-primary);
+}
+
+.icon-sample__label {
+  font-size: 0.8rem;
+  color: var(--color-secondary);
+}
+
+.lang-info {
+  margin-bottom: 0.6rem;
+  color: var(--color-secondary);
+  font-size: 0.85rem;
+}
+
+.lang-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.lang-button {
+  padding: 0.5rem 1rem;
+  border: 2px solid var(--color-background3);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--color-primary);
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.lang-button:hover {
+  border-color: var(--color-primary);
+}
+
+.lang-button.active {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: var(--color-background);
+}
+
+.consent-info {
+  margin-bottom: 0.6rem;
+  color: var(--color-secondary);
+  font-size: 0.85rem;
+}
+
+.consent-info code {
+  background: var(--color-background3);
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+  font-size: 0.85em;
+}
+
+.consent-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.consent-button {
+  padding: 0.5rem 1rem;
+  border: 2px solid var(--color-background3);
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.consent-button--grant {
+  color: var(--color-success, var(--color-primary));
+  border-color: var(--color-success, var(--color-background3));
+}
+
+.consent-button--grant:hover {
+  background: var(--color-success, var(--color-primary));
+  color: var(--color-background);
+}
+
+.consent-button--revoke {
+  color: var(--color-error, var(--color-primary));
+  border-color: var(--color-error, var(--color-background3));
+}
+
+.consent-button--revoke:hover {
+  background: var(--color-error, var(--color-primary));
+  color: var(--color-background);
+}
+
+.consent-hint {
+  font-size: 0.8rem;
+  color: var(--color-secondary);
+  opacity: 0.8;
 }
 
 .actions {
@@ -357,7 +570,7 @@ body {
 }
 
 .action-button {
-  padding: 0.75rem 1.25rem;
+  padding: 0.5rem 1rem;
   border: 2px solid var(--color-secondary);
   border-radius: 8px;
   background: transparent;

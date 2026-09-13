@@ -1,4 +1,4 @@
-// src/app/utils/normalize.ts
+// src/shared/utils/normalize.ts
 import { LOCALE_MAP, DEFAULT_LOCALE } from '../constants'
 
 /**

@@ -1,10 +1,12 @@
 // runtime/scripts/theme-init.ts
-import type { ThemeConfig, ThemeColors } from '../../app/types'
+import type { ThemeConfig, ThemeColors } from '../../shared/types'
+import { THEME_PREFERENCE_COOKIE, THEME_RESOLVED_COOKIE, THEME_LOCALE_COOKIE } from '../../shared/constants'
+import { hasCookieConsent } from '../../shared/utils/consent'
 
 declare global {
   interface Window {
-    __INITIAL_THEME__?: string
-    __INITIAL_LOCALE__?: string
+    __VENIX_INITIAL_THEME__?: string
+    __VENIX_INITIAL_LOCALE__?: string
   }
 }
 
@@ -15,21 +17,8 @@ function getCookie(name: string): string | null {
   return cookieValue ? decodeURIComponent(cookieValue) : null
 }
 
-function hasConsent(): boolean {
-  const consentData = localStorage.getItem('cookie-consent')
-  if (!consentData) return false
-
-  try {
-    const consent = JSON.parse(consentData)
-    return consent.functionality === true
-  }
-  catch {
-    return false
-  }
-}
-
 function setCookieIfConsented(name: string, value: string): void {
-  if (hasConsent()) {
+  if (hasCookieConsent()) {
     document.cookie = `${name}=${encodeURIComponent(value)}; path=/; max-age=31536000; SameSite=Lax`
   }
 }
@@ -55,18 +44,18 @@ export default function initTheme(themeData: ThemeConfig): void {
   const html = document.documentElement
 
   // Detecta e salva o locale
-  const savedLocale = getCookie('theme-locale')
+  const savedLocale = getCookie(THEME_LOCALE_COOKIE)
   const locale = savedLocale || detectLocale()
-  window.__INITIAL_LOCALE__ = locale
+  window.__VENIX_INITIAL_LOCALE__ = locale
 
   // Só salva cookie se tiver consentimento e não existir cookie
   if (!savedLocale) {
-    setCookieIfConsented('theme-locale', locale)
+    setCookieIfConsented(THEME_LOCALE_COOKIE, locale)
   }
 
   const defaultTheme: string = themeData.colors?.defaultColor || 'dark'
-  const preference = getCookie('theme-preference')
-  const resolved = getCookie('theme-resolved')
+  const preference = getCookie(THEME_PREFERENCE_COOKIE)
+  const resolved = getCookie(THEME_RESOLVED_COOKIE)
   let theme: string
 
   const systemPrefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
@@ -132,13 +121,13 @@ export default function initTheme(themeData: ThemeConfig): void {
 
   html.classList.add(theme)
   html.setAttribute('data-theme', theme)
-  window.__INITIAL_THEME__ = theme
+  window.__VENIX_INITIAL_THEME__ = theme
 
   if (!resolved || resolved !== theme) {
-    setCookieIfConsented('theme-resolved', theme)
+    setCookieIfConsented(THEME_RESOLVED_COOKIE, theme)
   }
 
   if (!preference) {
-    setCookieIfConsented('theme-preference', theme)
+    setCookieIfConsented(THEME_PREFERENCE_COOKIE, theme)
   }
 }

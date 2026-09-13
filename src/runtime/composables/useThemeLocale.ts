@@ -2,9 +2,9 @@
 import { ref, watch } from 'vue'
 import type { Ref } from 'vue'
 import { useRequestHeaders } from '#app'
-import type { ThemeConfig } from '../../app/types'
-import { DEFAULT_LOCALE } from '../../app/constants'
-import { normalizeLocale, extractFirstLocale } from '../../app/utils/normalize'
+import type { ThemeConfig } from '../../shared/types'
+import { DEFAULT_LOCALE } from '../../shared/constants'
+import { normalizeLocale, extractFirstLocale } from '../../shared/utils/normalize'
 
 export interface UseThemeLocaleOptions {
   enabled?: boolean

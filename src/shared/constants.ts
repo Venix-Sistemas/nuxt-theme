@@ -1,9 +1,16 @@
-// src/app/constants.ts
+// src/shared/constants.ts
 
 // ===== COOKIES =====
-export const THEME_PREFERENCE_COOKIE = 'theme-preference'
-export const THEME_RESOLVED_COOKIE = 'theme-resolved'
-export const THEME_LOCALE_COOKIE = 'theme-locale'
+export const THEME_PREFERENCE_COOKIE = 'venix-theme-preference'
+export const THEME_RESOLVED_COOKIE = 'venix-theme-resolved'
+export const THEME_LOCALE_COOKIE = 'venix-theme-locale'
+
+// ===== EVENTS =====
+export const COOKIE_PREFERENCES_UPDATED_EVENT = 'venix-cookie-preferences-updated'
+
+// ===== LOCAL STORAGE =====
+/** Lido (nunca escrito) por este módulo — a UI de consentimento de cookies do app consumidor grava aqui. */
+export const COOKIE_CONSENT_STORAGE_KEY = 'venix-cookie-consent'
 
 // ===== LOCALE =====
 export const DEFAULT_LOCALE = 'en-US'

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { loadTheme, extractLocales, getDefaultLocale } from '../../src/app/utils/load'
+import { loadTheme, extractLocales, getDefaultLocale } from '../../src/shared/utils/load'
 
 describe('loadTheme', () => {
   it('deve carregar o tema padrão', () => {

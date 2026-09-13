@@ -3,6 +3,7 @@ import { generateFontFaces, generateRootVars } from './typography'
 import { generateThemeVars } from './colors'
 import { generateCustomScrollbarCSS } from './scrollbar'
 import { generateCustomCursorCSS } from './cursor'
+import { generateThemeTransitionCSS } from './transition'
 
 export interface ProcessOptions {
   typography?: boolean
@@ -23,6 +24,7 @@ export function processTheme(theme: ThemeConfig, options: ProcessOptions = {}): 
   // Cores
   if (options.colors !== false && theme.colors?.enabled !== false) {
     if (theme.colors?.themes) {
+      output.push(generateThemeTransitionCSS())
       Object.entries(theme.colors.themes).forEach(([themeName, themeColors]) => {
         if (themeName === 'system') return
         if (!themeColors.primary && !themeColors.background) return
